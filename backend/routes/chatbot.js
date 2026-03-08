@@ -41,7 +41,7 @@ router.post('/chat', async (req, res) => {
     const intent = chatbotService.detectIntent(trimmedMessage);
     
     // Generate response based on intent
-    let response = chatbotService.generateResponse(intent, trimmedMessage);
+    let response = await chatbotService.generateResponse(intent, trimmedMessage);
 
     // Store lead if name and phone are provided
     let leadId = null;
@@ -69,7 +69,7 @@ router.post('/chat', async (req, res) => {
       success: true,
       intent: intent,
       message: response.message,
-      buttons: response.buttons || null,
+      doctors: response.doctors || null,
       suggestions: response.suggestions || null,
       leadId: leadId,
       timestamp: new Date().toISOString()

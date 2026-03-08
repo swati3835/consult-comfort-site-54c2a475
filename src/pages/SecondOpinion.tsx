@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, X, CheckCircle2, ArrowLeft, ArrowRight } from "lucide-react";
+import ConsentForm from "@/components/ConsentForm";
 
 declare global {
   interface Window {
@@ -19,9 +20,11 @@ const SecondOpinion = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [step, setStep] = useState(1); // 1: info, 2: documents, 3: confirmation, 4: payment, 5: done
+  const [step, setStep] = useState(1); // 1: info, 2: documents, 3: confirmation, 4: consent, 5: payment, 6: done
   const [loading, setLoading] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [showConsentForm, setShowConsentForm] = useState(false);
+  const [consentData, setConsentData] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -77,12 +80,18 @@ const SecondOpinion = () => {
       if (!res.ok) throw new Error(data.message || "Submission failed");
 
       setSecondOpinionId(data.id);
-      setStep(4);
+      setStep(4); // Go to consent form step
     } catch (err: any) {
       toast({ title: "Error", description: err.message });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleConsentAccept = (consentFormData: any) => {
+    setConsentData(consentFormData);
+    setShowConsentForm(false);
+    setStep(5); // Move to payment step
   };
 
   const handleStripePayment = async () => {
@@ -157,7 +166,7 @@ const SecondOpinion = () => {
 
             if (verifyRes.ok) {
               modal.remove();
-              setStep(5);
+              setStep(6);
               toast({
                 title: "Success",
                 description: "Second opinion request submitted successfully!"
@@ -191,50 +200,53 @@ const SecondOpinion = () => {
 
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            {/* Step Progress */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
+          <div className="grid md:grid-cols-4 gap-8 items-start">
+            {/* Stepper column - matches consultation layout */}
+            <div className="md:col-span-1">
+              <div className="hidden md:block sticky top-28 space-y-4">
                 {[
                   { num: 1, label: "Personal Info" },
                   { num: 2, label: "Documents" },
                   { num: 3, label: "Review" },
-                  { num: 4, label: "Payment" },
-                  { num: 5, label: "Confirmation" },
-                ].map((s, idx) => (
-                  <div key={s.num} className="flex items-center flex-1">
+                  { num: 4, label: "Consent" },
+                  { num: 5, label: "Payment" },
+                  { num: 6, label: "Done" },
+                ].map((s) => (
+                  <div key={s.num} className="flex items-center gap-3">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                         step > s.num
                           ? "bg-gold text-white"
                           : step === s.num
-                          ? "bg-primary text-white ring-4 ring-primary/30"
-                          : "bg-border text-muted-foreground"
+                          ? "bg-primary text-white"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
-                      {step > s.num ? <CheckCircle2 className="w-5 h-5" /> : s.num}
+                      {step > s.num ? <CheckCircle2 className="w-4 h-4" /> : s.num}
                     </div>
-                    {idx < 4 && (
-                      <div
-                        className={`flex-1 h-1 mx-2 rounded ${
-                          step > s.num ? "bg-gold" : "bg-border"
-                        }`}
-                      />
-                    )}
+                    <div className="text-sm text-muted-foreground">{s.label}</div>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Personal Info</span>
-                <span>Documents</span>
-                <span>Review</span>
-                <span>Payment</span>
-                <span>Confirmation</span>
+
+              {/* Compact mobile labels */}
+              <div className="md:hidden mb-6">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Info</span>
+                  <span>Docs</span>
+                  <span>Review</span>
+                  <span>Consent</span>
+                  <span>Pay</span>
+                  <span>Done</span>
+                </div>
               </div>
             </div>
 
-            {/* Step 1: Personal Information */}
-            {step === 1 && (
+            {/* Main content column */}
+            <div className="md:col-span-3">
+              <div className="max-w-full">
+                {/* Step 1: Personal Information */}
+                {step === 1 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Personal Information</CardTitle>
@@ -246,7 +258,6 @@ const SecondOpinion = () => {
                       <label className="block text-sm font-semibold mb-2">Full Name *</label>
                       <input
                         type="text"
-                        placeholder="John Doe"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -257,7 +268,6 @@ const SecondOpinion = () => {
                       <label className="block text-sm font-semibold mb-2">Phone *</label>
                       <input
                         type="tel"
-                        placeholder="+91 9876543210"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -268,7 +278,6 @@ const SecondOpinion = () => {
                       <label className="block text-sm font-semibold mb-2">Email *</label>
                       <input
                         type="email"
-                        placeholder="john@example.com"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -280,7 +289,6 @@ const SecondOpinion = () => {
                         <label className="block text-sm font-semibold mb-2">Age</label>
                         <input
                           type="number"
-                          placeholder="30"
                           value={formData.age}
                           onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                           className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -331,7 +339,6 @@ const SecondOpinion = () => {
                     <div>
                       <label className="block text-sm font-semibold mb-2">Medical Condition Description *</label>
                       <textarea
-                        placeholder="Describe your medical condition in detail..."
                         value={formData.remarks}
                         onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -457,8 +464,97 @@ const SecondOpinion = () => {
               </Card>
             )}
 
-            {/* Step 4: Payment */}
+            {/* Step 4: Consent Form */}
             {step === 4 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Consent & Legal Acknowledgement</CardTitle>
+                  <CardDescription>Please review and accept the consent form before proceeding to payment</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-blue-900">
+                      <span className="font-semibold">Important:</span> You must accept the patient consent declaration to proceed with payment. This ensures you understand the limitations and scope of the second opinion service.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Step 5: Payment */}
+            {step === 5 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Complete Payment</CardTitle>
+                  <CardDescription>Secure payment via Stripe</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="bg-muted rounded-lg p-4 space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span>Service:</span>
+                        <span className="font-semibold">Second Opinion Review</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Documents:</span>
+                        <span className="font-semibold">{files.length} file(s)</span>
+                      </div>
+                      <div className="border-t pt-3 flex justify-between">
+                        <span className="font-semibold">Total Amount:</span>
+                        <span className="text-2xl font-bold text-gold">₹{FEE}</span>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="gold"
+                      onClick={handleStripePayment}
+                      disabled={paymentProcessing}
+                      className="w-full"
+                    >
+                      {paymentProcessing ? "Processing..." : `Pay ₹${FEE}`}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Step 6: Confirmation */}
+            {step === 6 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Request Submitted Successfully!</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center space-y-6">
+                    <CheckCircle2 className="w-16 h-16 mx-auto text-gold" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">Thank You!</h3>
+                      <p className="text-muted-foreground">
+                        Your second opinion request has been submitted successfully. Our specialists will review your documents and provide their expert opinion within 2-3 business days.
+                      </p>
+                    </div>
+                    <div className="bg-muted rounded-lg p-4 space-y-2 text-sm">
+                      <p>
+                        <span className="font-semibold">Request ID:</span> {secondOpinionId}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Email:</span> {formData.email}
+                      </p>
+                    </div>
+                    <Button
+                      variant="gold"
+                      onClick={() => navigate("/")}
+                      className="w-full"
+                    >
+                      Back to Home
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Old Step 4: Payment */}
+            {step === 999 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Complete Payment</CardTitle>
@@ -549,7 +645,7 @@ const SecondOpinion = () => {
             )}
 
             {/* Navigation Buttons */}
-            {step < 5 && (
+            {step < 6 && (
               <div className="flex justify-between mt-8">
                 <Button
                   variant="outline"
@@ -560,7 +656,7 @@ const SecondOpinion = () => {
                   <ArrowLeft className="w-4 h-4" />
                   Back
                 </Button>
-                {step < 4 && (
+                {step < 5 && (
                   <Button
                     variant="gold"
                     onClick={() => {
@@ -574,6 +670,8 @@ const SecondOpinion = () => {
                       }
                       if (step === 3) {
                         handleSubmitForm();
+                      } else if (step === 4) {
+                        setShowConsentForm(true);
                       } else {
                         setStep(step + 1);
                       }
@@ -581,12 +679,20 @@ const SecondOpinion = () => {
                     disabled={loading}
                     className="flex items-center gap-2"
                   >
-                    {step === 3 ? "Proceed to Payment" : "Continue"}
+                    {step === 3 ? "Review & Proceed" : step === 4 ? "Review Consent" : "Continue"}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 )}
               </div>
             )}
+
+            {/* ConsentForm Modal */}
+            <ConsentForm 
+              open={showConsentForm} 
+              onClose={() => setShowConsentForm(false)} 
+              onAccept={handleConsentAccept}
+            />
+            </div>
           </div>
         </div>
       </section>

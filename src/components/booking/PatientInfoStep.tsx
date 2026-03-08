@@ -118,8 +118,8 @@
                value={patientInfo.gender}
                onValueChange={(value) => handleChange("gender", value)}
              >
-               <SelectTrigger className="h-12">
-                 <SelectValue placeholder="Select gender" />
+             <SelectTrigger className="h-12">
+                 <SelectValue />
                </SelectTrigger>
                <SelectContent>
                  <SelectItem value="male">Male</SelectItem>
@@ -136,23 +136,21 @@
          <h3 className="font-semibold text-foreground mb-2">Medical History</h3>
          <div className="space-y-2">
            <Label htmlFor="medicalHistory">Previous Medical Conditions</Label>
-           <Textarea
-             id="medicalHistory"
-             placeholder="List any previous surgeries, chronic conditions, allergies, etc."
-             value={patientInfo.medicalHistory}
-             onChange={(e) => handleChange("medicalHistory", e.target.value)}
-             rows={3}
-           />
+          <Textarea
+            id="medicalHistory"
+            value={patientInfo.medicalHistory}
+            onChange={(e) => handleChange("medicalHistory", e.target.value)}
+            rows={3}
+          />
          </div>
          <div className="space-y-2">
            <Label htmlFor="medications">Current Medications</Label>
-           <Textarea
-             id="medications"
-             placeholder="List any medications you are currently taking"
-             value={patientInfo.currentMedications}
-             onChange={(e) => handleChange("currentMedications", e.target.value)}
-             rows={3}
-           />
+          <Textarea
+           id="medications"
+           value={patientInfo.currentMedications}
+           onChange={(e) => handleChange("currentMedications", e.target.value)}
+           rows={3}
+         />
          </div>
        </div>
  
@@ -195,14 +193,13 @@
          <h3 className="font-semibold text-foreground mb-2">Symptoms Description *</h3>
          <div className="space-y-2">
            <Label htmlFor="symptoms">Describe your current symptoms or concerns</Label>
-           <Textarea
-             id="symptoms"
-             placeholder="Please describe what you're experiencing in detail..."
-             value={patientInfo.symptoms}
-             onChange={(e) => handleChange("symptoms", e.target.value)}
-             rows={4}
-             required
-           />
+          <Textarea
+            id="symptoms"
+            value={patientInfo.symptoms}
+            onChange={(e) => handleChange("symptoms", e.target.value)}
+            rows={4}
+            required
+          />
          </div>
        </div>
      </div>

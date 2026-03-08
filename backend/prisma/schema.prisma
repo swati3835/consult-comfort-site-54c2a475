@@ -103,3 +103,28 @@ model Lead {
   @@index([contacted])
   @@index([createdAt])
 }
+model Prescription {
+  id                String   @id @default(uuid())
+  patientName       String
+  patientAge        Int?
+  patientGender     String?
+  patientEmail      String?
+  consultationId    String
+  doctorName        String
+  doctorId          String?
+  doctorSpecialty   String?
+  diagnosis         String
+  medications       String   // JSON stringified array of medications
+  notes             String?
+  status            String   @default("active") // active, fulfilled, expired
+  followUpDate      DateTime?
+  emailSentAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([consultationId])
+  @@index([patientEmail])
+  @@index([doctorId])
+  @@index([status])
+  @@index([createdAt])
+}

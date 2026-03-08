@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, X, CheckCircle2, ArrowLeft, ArrowRight, FileText } from "lucide-react";
+import ConsentForm from "@/components/ConsentForm";
 
 declare global {
   interface Window {
@@ -19,7 +20,7 @@ const DocumentUpload = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [step, setStep] = useState(1); // 1: select type, 2: upload, 3: review, 4: payment, 5: confirmation
+  const [step, setStep] = useState(1); // 1: upload, 2: review, 3: consent, 4: payment, 5: confirmation
   const [loading, setLoading] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
@@ -27,6 +28,8 @@ const DocumentUpload = () => {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [uploadId, setUploadId] = useState("");
+  const [showConsentForm, setShowConsentForm] = useState(false);
+  const [consentData, setConsentData] = useState<any>(null);
 
   const DOCUMENT_TYPES = [
     { id: "prescription", label: "Prescription", icon: FileText },
@@ -87,7 +90,7 @@ const DocumentUpload = () => {
       if (!res.ok) throw new Error(data.message || "Upload failed");
 
       setUploadId(data.id);
-      setStep(4);
+      setStep(3);
     } catch (err: any) {
       toast({ title: "Error", description: err.message });
     } finally {
@@ -201,94 +204,61 @@ const DocumentUpload = () => {
 
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            {/* Step Progress */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
+          <div className="grid md:grid-cols-4 gap-8 items-start">
+            {/* Stepper column – match consultation layout for Board Review flow */}
+            <div className="md:col-span-1">
+              <div className="hidden md:block sticky top-28 space-y-4">
                 {[
-                  { num: 1, label: "Document Type" },
-                  { num: 2, label: "Upload Files" },
-                  { num: 3, label: "Review" },
+                  { num: 1, label: "Upload" },
+                  { num: 2, label: "Review" },
+                  { num: 3, label: "Consent" },
                   { num: 4, label: "Payment" },
-                  { num: 5, label: "Confirmation" },
-                ].map((s, idx) => (
-                  <div key={s.num} className="flex items-center flex-1">
+                  { num: 5, label: "Done" },
+                ].map((s) => (
+                  <div key={s.num} className="flex items-center gap-3">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                         step > s.num
                           ? "bg-gold text-white"
                           : step === s.num
-                          ? "bg-primary text-white ring-4 ring-primary/30"
-                          : "bg-border text-muted-foreground"
+                          ? "bg-primary text-white"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
-                      {step > s.num ? <CheckCircle2 className="w-5 h-5" /> : s.num}
+                      {step > s.num ? <CheckCircle2 className="w-4 h-4" /> : s.num}
                     </div>
-                    {idx < 4 && (
-                      <div
-                        className={`flex-1 h-1 mx-2 rounded ${
-                          step > s.num ? "bg-gold" : "bg-border"
-                        }`}
-                      />
-                    )}
+                    <div className="text-sm text-muted-foreground">{s.label}</div>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Type</span>
-                <span>Upload</span>
-                <span>Review</span>
-                <span>Payment</span>
-                <span>Confirmation</span>
+
+              {/* Compact mobile labels */}
+              <div className="md:hidden mb-6">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Upload</span>
+                  <span>Review</span>
+                  <span>Consent</span>
+                  <span>Pay</span>
+                  <span>Done</span>
+                </div>
               </div>
             </div>
 
-            {/* Step 1: Select Document Type */}
+            {/* Main content column */}
+            <div className="md:col-span-3">
+              <div className="max-w-full">
+            {/* Step 1: Upload Files */}
             {step === 1 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Select Document Type</CardTitle>
-                  <CardDescription>Choose the type of medical document you want to upload</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    {DOCUMENT_TYPES.map((type) => {
-                      const Icon = type.icon;
-                      const fee = FEES[type.id as keyof typeof FEES];
-                      return (
-                        <div
-                          key={type.id}
-                          onClick={() => setDocumentType(type.id)}
-                          className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                            documentType === type.id
-                              ? "border-gold bg-gold/5"
-                              : "border-border hover:border-gold/50"
-                          }`}
-                        >
-                          <Icon className="w-6 h-6 text-primary mb-2" />
-                          <h3 className="font-semibold text-sm">{type.label}</h3>
-                          <p className="text-xs text-gold font-semibold mt-2">₹{fee}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 2: Upload Files */}
-            {step === 2 && (
-              <Card>
-                <CardHeader>
                   <CardTitle>Upload Medical Documents</CardTitle>
-                  <CardDescription>Upload your {DOCUMENT_TYPES.find(d => d.id === documentType)?.label || "medical documents"}</CardDescription>
+                  <CardDescription>Please provide your medical records for upload</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-semibold mb-2">Description / Remarks</label>
                       <textarea
-                        placeholder="Add any relevant information about these documents..."
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -349,8 +319,10 @@ const DocumentUpload = () => {
               </Card>
             )}
 
-            {/* Step 3: Review */}
-            {step === 3 && (
+            
+
+            {/* Step 2: Review */}
+            {step === 2 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Review Your Upload</CardTitle>
@@ -363,7 +335,7 @@ const DocumentUpload = () => {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Document Type:</span>
-                          <span>{DOCUMENT_TYPES.find(d => d.id === documentType)?.label}</span>
+                          <span>Uploaded Documents</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Files:</span>
@@ -403,6 +375,23 @@ const DocumentUpload = () => {
               </Card>
             )}
 
+            {/* Step 3: Consent Form */}
+            {step === 3 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Consent & Legal Acknowledgement</CardTitle>
+                  <CardDescription>Please review and accept the consent form before proceeding to payment</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-blue-900">
+                      <span className="font-semibold">Important:</span> You must accept the patient consent declaration to proceed with payment. This ensures you understand the limitations and scope of the service.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Step 4: Payment */}
             {step === 4 && (
               <Card>
@@ -413,9 +402,9 @@ const DocumentUpload = () => {
                 <CardContent>
                   <div className="space-y-6">
                     <div className="bg-muted rounded-lg p-4 space-y-3">
-                      <div className="flex justify-between text-sm">
+                        <div className="flex justify-between text-sm">
                         <span>Document Type:</span>
-                        <span className="font-semibold">{DOCUMENT_TYPES.find(d => d.id === documentType)?.label}</span>
+                        <span className="font-semibold">Uploaded Documents</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Files Uploaded:</span>
@@ -460,7 +449,7 @@ const DocumentUpload = () => {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Document Type:</span>
-                        <span>{DOCUMENT_TYPES.find(d => d.id === documentType)?.label}</span>
+                        <span>Uploaded Documents</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Files:</span>
@@ -510,29 +499,43 @@ const DocumentUpload = () => {
                   <Button
                     variant="gold"
                     onClick={() => {
-                      if (step === 1 && !documentType) {
-                        toast({ title: "Error", description: "Please select a document type" });
-                        return;
-                      }
-                      if (step === 2 && files.length === 0) {
+                      if (step === 1 && files.length === 0) {
                         toast({ title: "Error", description: "Please upload at least one document" });
                         return;
                       }
-                      if (step === 3) {
+                      if (step === 2) {
                         handleSubmitDocuments();
-                      } else {
-                        setStep(step + 1);
+                        return;
                       }
+                      if (step === 3) {
+                        // open consent modal
+                        setShowConsentForm(true);
+                        return;
+                      }
+                      setStep(step + 1);
                     }}
                     disabled={loading}
                     className="flex items-center gap-2"
                   >
-                    {step === 3 ? "Proceed to Payment" : "Continue"}
+                    {step === 2 ? "Proceed to Consent" : "Continue"}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 )}
               </div>
             )}
+
+            {/* ConsentForm Modal */}
+            <ConsentForm
+              open={showConsentForm}
+              onClose={() => setShowConsentForm(false)}
+              onAccept={(data) => {
+                setConsentData(data);
+                setShowConsentForm(false);
+                setStep(4);
+              }}
+            />
+              </div>
+            </div>
           </div>
         </div>
       </section>

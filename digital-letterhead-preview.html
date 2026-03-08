@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Letterhead Preview - KANT Healthcare</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --primary: #001a3a;
+      --gold: #d4af37;
+      --muted-foreground: #666;
+    }
+    
+    .text-primary {
+      color: var(--primary);
+    }
+    
+    .text-muted-foreground {
+      color: var(--muted-foreground);
+    }
+    
+    .border-gold {
+      border-color: var(--gold);
+    }
+    
+    .bg-gold {
+      background-color: var(--gold);
+    }
+    
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="p-8 max-w-5xl mx-auto">
+    <!-- Digital Letterhead -->
+    <div class="w-full bg-white border-b-4 border-gold p-8 rounded-lg shadow-md">
+      <div class="max-w-4xl mx-auto">
+        <!-- Header Row with Logo and Details -->
+        <div class="flex items-start justify-between mb-6">
+          <!-- Left: Logo and Clinic Name -->
+          <div class="flex items-center gap-4">
+            <!-- Logo Placeholder -->
+            <div class="w-16 h-16 flex-shrink-0 bg-gradient-to-br from-blue-900 to-blue-700 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm text-center">KANT</span>
+            </div>
+            
+            <!-- Clinic Info -->
+            <div>
+              <h1 class="text-3xl font-bold text-primary">
+                KANT Healthcare
+              </h1>
+              <p class="text-sm text-muted-foreground tracking-wide">
+                YOUR HEALTH, OUR PRIORITY
+              </p>
+            </div>
+          </div>
+
+          <!-- Right: Contact Details -->
+          <div class="text-right text-sm space-y-1">
+            <div class="flex items-center justify-end gap-2 text-muted-foreground">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+              </svg>
+              <span>+91 74094 66222</span>
+            </div>
+            <div class="flex items-center justify-end gap-2 text-muted-foreground">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+              </svg>
+              <span>www.kanthealthcare.com</span>
+            </div>
+            <div class="flex items-center justify-end gap-2 text-muted-foreground">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              <span>info@kanthealthcare.com</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t-2 border-b-2 border-gold py-3 mb-6">
+          <p class="text-center text-xs font-semibold text-primary uppercase tracking-widest">
+            Licensed Medical Consultation Platform
+          </p>
+        </div>
+
+        <!-- QR Code Footer -->
+        <div class="flex justify-between items-center pt-4 border-t border-gray-300">
+          <div class="text-xs text-muted-foreground">
+            <p>Scan QR code to visit our website</p>
+          </div>
+          <!-- QR Code Placeholder -->
+          <div class="w-24 h-24 bg-gray-200 border-2 border-gray-300 flex items-center justify-center rounded">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-600">█ █</div>
+              <div class="text-2xl font-bold text-gray-600">█ █</div>
+              <p class="text-xs text-gray-500 mt-2">QR Code</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="mt-8 bg-white p-8 rounded-lg shadow-md">
+      <p class="text-muted-foreground text-sm mb-4">Document Content Goes Here</p>
+      <div class="space-y-4 text-sm">
+        <p class="text-muted-foreground leading-relaxed">
+          This is where your prescription, medical report, or consultation document would appear.
+        </p>
+        <p class="text-muted-foreground leading-relaxed">
+          The letterhead above will be included when you export this document as PDF.
+        </p>
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-8 bg-blue-50 border-l-4 border-primary p-4 rounded">
+      <h3 class="font-semibold text-primary mb-2">About This Letterhead</h3>
+      <ul class="text-sm text-muted-foreground space-y-1">
+        <li>✓ Professional clinic branding with logo and contact details</li>
+        <li>✓ QR code automatically generated from the configured URL</li>
+        <li>✓ Print-ready with optimized spacing and colors</li>
+        <li>✓ Fully responsive and customizable</li>
+        <li>✓ Used for prescriptions, medical reports, and official documents</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

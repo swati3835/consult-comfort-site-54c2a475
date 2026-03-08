@@ -11,12 +11,17 @@ const Doctors = () => {
       <section className="py-20 bg-primary">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
+            
             <span className="inline-block px-4 py-2 bg-gold/20 text-gold rounded-full text-sm font-medium mb-6">
               Our Medical Team
             </span>
-            <h1 className="font-serif text-4xl md:text-5xl font-bold text-white mb-6">
-              Meet Our Distinguished Consultants
+            <h1 className="font-serif text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              <span className="text-white">Meet Our</span>
+              <span className="block text-gold">Distinguished Consultants</span>
             </h1>
+
+
+            
             <p className="text-xl text-white/80 leading-relaxed">
               Our team of highly qualified specialists brings together decades of experience 
               and expertise across multiple medical disciplines.
@@ -37,7 +42,7 @@ const Doctors = () => {
                 }`}
               >
                 <div className="lg:col-span-1">
-                  <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-elevated">
+                  <div className="aspect-[3/4] rounded-xl overflow-hidden shadow-elevated lg:max-w-[320px] mx-auto">
                     <img
                       src={doctor.image}
                       alt={doctor.name}

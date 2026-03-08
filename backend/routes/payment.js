@@ -6,7 +6,15 @@ const Stripe = require('stripe');
 const sendWhatsApp = require('../services/twilio');
 
 const prisma = new PrismaClient();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Initialize Stripe with validation
+if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_xxx') {
+  console.error('❌ STRIPE_SECRET_KEY is not configured properly. Please add your real Stripe secret key to .env file');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2024-06-20'
+});
 
 // Create Stripe payment intent
 router.post('/stripe/create-intent',
@@ -18,7 +26,23 @@ router.post('/stripe/create-intent',
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     try {
+      // Validate Stripe key is configured
+      if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_xxx') {
+        return res.status(500).json({ 
+          message: 'Stripe is not configured. Please add STRIPE_SECRET_KEY to .env file.',
+          code: 'STRIPE_NOT_CONFIGURED'
+        });
+      }
+
       const { amount, type, refId } = req.body;
+      
+      // Validate amount is at least 50 INR (0.5 USD equivalent)
+      if (amount < 50) {
+        return res.status(400).json({ 
+          message: 'Minimum amount is 50 INR' 
+        });
+      }
+
       const intent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100),
         currency: 'inr',
@@ -26,8 +50,31 @@ router.post('/stripe/create-intent',
       });
       res.json({ clientSecret: intent.client_secret });
     } catch (err) {
-      console.error('Stripe error:', err);
-      res.status(500).json({ message: 'Failed to create payment intent' });
+      console.error('Stripe error details:', {
+        message: err.message,
+        type: err.type,
+        code: err.code,
+        statusCode: err.statusCode,
+        stripeKeyConfigured: !!process.env.STRIPE_SECRET_KEY
+      });
+      
+      // Provide specific error messages
+      if (err.type === 'StripeInvalidRequestError') {
+        res.status(400).json({ 
+          message: 'Invalid payment request: ' + err.message,
+          code: err.code
+        });
+      } else if (err.type === 'StripeAuthenticationError') {
+        res.status(500).json({ 
+          message: 'Stripe authentication failed. Invalid API key.',
+          code: 'STRIPE_AUTH_ERROR'
+        });
+      } else {
+        res.status(500).json({ 
+          message: 'Failed to create payment intent: ' + err.message,
+          code: err.code || 'UNKNOWN_ERROR'
+        });
+      }
     }
   }
 );

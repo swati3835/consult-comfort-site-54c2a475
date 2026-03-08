@@ -106,7 +106,6 @@ const DoctorLogin = () => {
                 <input
                   type="email"
                   name="email"
-                  placeholder="james.whitmore@kanthealth.com"
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -119,7 +118,6 @@ const DoctorLogin = () => {
                 <input
                   type="password"
                   name="password"
-                  placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"

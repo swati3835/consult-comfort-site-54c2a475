@@ -1,63 +1,36 @@
  // KANT Healthcare - Clinic Data
  
- import doctor1 from "@/assets/doctor-1.jpg";
- import doctor2 from "@/assets/doctor-2.jpg";
- import doctor3 from "@/assets/doctor-3.jpg";
- import doctor4 from "@/assets/doctor-4.jpg";
+ import drBharat from "@/assets/drBharat.jpeg";
+ import drChandrakant from "@/assets/drChandrakant.jpeg";
  
  export const departments = [
    { id: "cardiology", name: "Cardiology", description: "Heart and cardiovascular care" },
-   { id: "pediatrics", name: "Pediatrics", description: "Child and adolescent health" },
-   { id: "orthopedics", name: "Orthopedics", description: "Bone, joint and muscle care" },
-   { id: "gynecology", name: "Gynecology", description: "Women's health and reproductive care" },
-   { id: "dermatology", name: "Dermatology", description: "Skin health and conditions" },
+   { id: "surgery", name: "Surgery", description: "Surgical procedures and care" },
    { id: "general-medicine", name: "General Medicine", description: "Comprehensive health assessments" },
  ];
  
  export const doctors = [
    {
-     id: "1",
-     name: "Dr. James Whitmore",
-     specialty: "Consultant Cardiologist",
+     id: "drBharat",
+     name: "Dr. Bharat",
+     specialty: "Non Interventional Cardiologist",
      department: "cardiology",
-     image: doctor1,
-     experience: "25+ years",
-     qualifications: "MBBS, MD, FRCP",
-     bio: "Dr. Whitmore is a leading cardiologist with extensive experience in interventional cardiology and heart failure management.",
-     specialisms: ["Coronary Artery Disease", "Heart Failure", "Arrhythmias", "Preventive Cardiology"],
-   },
-   {
-     id: "2",
-     name: "Dr. Priya Sharma",
-     specialty: "Consultant Physician",
-     department: "general-medicine",
-     image: doctor2,
-     experience: "18+ years",
-     qualifications: "MBBS, MRCP, PhD",
-     bio: "Dr. Sharma specialises in internal medicine with a particular focus on endocrinology and metabolic disorders.",
-     specialisms: ["Diabetes Management", "Thyroid Disorders", "General Medicine", "Preventive Health"],
-   },
-   {
-     id: "3",
-     name: "Dr. Michael Okonkwo",
-     specialty: "Consultant Orthopaedic Surgeon",
-     department: "orthopedics",
-     image: doctor3,
+     image: drBharat,
      experience: "15+ years",
-     qualifications: "MBChB, FRCS (Orth)",
-     bio: "Dr. Okonkwo is an expert orthopaedic surgeon specialising in joint replacement and sports injuries.",
-     specialisms: ["Hip & Knee Replacement", "Sports Injuries", "Arthroscopy", "Trauma Surgery"],
+     qualifications: "MBBS, DM Cardiology, FACC",
+     bio: "Dr. Bharat is an experienced non-interventional cardiologist specializing in cardiac diagnostics, heart failure management, and preventive cardiology.",
+     specialisms: ["Cardiac Diagnostics", "Heart Failure Management", "Preventive Cardiology", "Arrhythmia Management"],
    },
    {
-     id: "4",
-     name: "Dr. Elizabeth Hayes",
-     specialty: "Consultant Dermatologist",
-     department: "dermatology",
-     image: doctor4,
-     experience: "12+ years",
-     qualifications: "MBBS, MRCP (Derm)",
-     bio: "Dr. Hayes is a highly skilled dermatologist with expertise in both medical and cosmetic dermatology.",
-     specialisms: ["Skin Cancer Screening", "Acne & Rosacea", "Eczema & Psoriasis", "Cosmetic Dermatology"],
+     id: "drChandrakant",
+     name: "Dr. Chandrakant",
+     specialty: "Surgeon",
+     department: "surgery",
+     image: drChandrakant,
+     experience: "20+ years",
+     qualifications: "MBBS, MS General Surgery, FICS",
+     bio: "Dr. Chandrakant is a highly skilled surgeon with extensive expertise in general and specialized surgical procedures, ensuring optimal patient outcomes.",
+     specialisms: ["General Surgery", "Minimally Invasive Surgery", "Trauma Surgery", "Emergency Surgical Care"],
    },
  ];
  

@@ -165,13 +165,13 @@ const Services = () => {
                <Link
                  to="/book"
                  key={dept.id}
-                className="bg-card rounded-xl p-6 text-center shadow-soft hover:shadow-card transition-all duration-300"
+                className="bg-card rounded-xl p-6 text-center shadow-soft hover:shadow-elevated transition-all duration-300 border border-border hover:border-gold group"
               >
-                <div className="w-14 h-14 rounded-lg bg-sky flex items-center justify-center mx-auto mb-4">
-                   <Icon className="w-7 h-7 text-primary" />
+                <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-sky to-sky/70 flex items-center justify-center mx-auto mb-4 group-hover:from-gold group-hover:to-gold/80 transition-all duration-300">
+                   <Icon className="w-8 h-8 text-primary group-hover:text-white transition-colors duration-300" />
                 </div>
-                 <h3 className="font-semibold text-foreground mb-1">{dept.name}</h3>
-                 <p className="text-muted-foreground text-xs">{dept.description}</p>
+                 <h3 className="font-semibold text-foreground mb-2 text-sm">{dept.name}</h3>
+                 <p className="text-muted-foreground text-xs leading-relaxed">{dept.description}</p>
                </Link>
              );
              })}

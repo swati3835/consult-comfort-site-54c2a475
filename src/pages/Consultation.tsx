@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, Video, CheckCircle2, ArrowLeft, ArrowRight } from "lucide-react";
+import ConsentForm from "@/components/ConsentForm";
 import { Badge } from "@/components/ui/badge";
+import { doctors as clinicDoctors } from "@/data/clinic-data";
 
 declare global {
   interface Window {
@@ -45,11 +47,12 @@ const Consultation = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [step, setStep] = useState(1); // 1: consultation type, 2: doctor, 3: date/time, 4: patient info, 5: payment, 6: confirmation
+  const [step, setStep] = useState(1); // 1: doctor, 2: date/time, 3: patient info, 4: consent, 5: payment, 6: confirmation
   const [doctors, setDoctors] = useState<any[]>([]);
   const [slots, setSlots] = useState<any[]>([]);
   
-  const [consultationType, setConsultationType] = useState<"voice" | "video" | "">("");
+  // default type since selection step removed
+  const [consultationType, setConsultationType] = useState<"voice" | "video" | "">("video");
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
@@ -64,6 +67,8 @@ const Consultation = () => {
 
   const [consultationId, setConsultationId] = useState("");
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [showConsentForm, setShowConsentForm] = useState(false);
+  const [consentData, setConsentData] = useState<any>(null);
 
   const currentPrice = CONSULTATION_TYPES.find(c => c.type === consultationType)?.price || 0;
   const selectedDoctorInfo = doctors.find(d => d.doctorId === selectedDoctor);
@@ -103,25 +108,26 @@ const Consultation = () => {
   }, [selectedDoctor, selectedDate]);
 
   const handleContinue = async () => {
-    if (step === 1 && !consultationType) {
-      toast({ title: "Error", description: "Please select consultation type" });
-      return;
-    }
-    if (step === 2 && !selectedDoctor) {
+    if (step === 1 && !selectedDoctor) {
       toast({ title: "Error", description: "Please select a doctor" });
       return;
     }
-    if (step === 3 && (!selectedDate || !selectedSlot)) {
+    if (step === 2 && (!selectedDate || !selectedSlot)) {
       toast({ title: "Error", description: "Please select date and time" });
       return;
     }
-    if (step === 4) {
+    if (step === 3) {
       if (!formData.patientName || !formData.phone || !formData.symptoms) {
         toast({ title: "Error", description: "Please fill required fields" });
         return;
       }
       // Book consultation
       await bookConsultation();
+      return;
+    }
+    // If we're on consent step, open the consent modal
+    if (step === 4) {
+      setShowConsentForm(true);
       return;
     }
     setStep(step + 1);
@@ -149,7 +155,9 @@ const Consultation = () => {
       if (!res.ok) throw new Error(data.message || "Booking failed");
 
       setConsultationId(data.id);
-      setStep(5);
+      // after booking go to consent step and open modal
+      setStep(4);
+      setShowConsentForm(true);
     } catch (err: any) {
       toast({ title: "Error", description: err.message });
     } finally {
@@ -256,366 +264,255 @@ const Consultation = () => {
     <Layout>
       <section className="py-12 bg-primary">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-4">
-            Book a Consultation
-          </h1>
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-4">Book a Consultation</h1>
           <p className="text-white/80">Get expert medical advice from our specialists</p>
         </div>
       </section>
 
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            {/* Step Progress */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
+          <div className="grid md:grid-cols-4 gap-8 items-start">
+            {/* Stepper - vertical on md+, horizontal condensed on mobile */}
+            <div className="md:col-span-1">
+              <div className="hidden md:block sticky top-28 space-y-4">
                 {[
-                  { num: 1, label: "Type" },
-                  { num: 2, label: "Doctor" },
-                  { num: 3, label: "Date & Time" },
-                  { num: 4, label: "Patient Info" },
+                  { num: 1, label: "Doctor" },
+                  { num: 2, label: "Date & Time" },
+                  { num: 3, label: "Your Info" },
+                  { num: 4, label: "Consent" },
                   { num: 5, label: "Payment" },
-                  { num: 6, label: "Confirmation" },
-                ].map((s, idx) => (
-                  <div key={s.num} className="flex items-center flex-1">
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                        step > s.num
-                          ? "bg-gold text-white"
-                          : step === s.num
-                          ? "bg-primary text-white ring-4 ring-primary/30"
-                          : "bg-border text-muted-foreground"
-                      }`}
-                    >
-                      {step > s.num ? <CheckCircle2 className="w-5 h-5" /> : s.num}
+                  { num: 6, label: "Done" },
+                ].map((s) => (
+                  <div key={s.num} className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${step > s.num ? 'bg-gold text-white' : step === s.num ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
+                      {step > s.num ? <CheckCircle2 className="w-4 h-4" /> : s.num}
                     </div>
-                    {idx < 5 && (
-                      <div
-                        className={`flex-1 h-1 mx-2 rounded ${
-                          step > s.num ? "bg-gold" : "bg-border"
-                        }`}
-                      />
-                    )}
+                    <div className="text-sm text-muted-foreground">{s.label}</div>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Type</span>
-                <span>Doctor</span>
-                <span>Date & Time</span>
-                <span>Patient Info</span>
-                <span>Payment</span>
-                <span>Confirmation</span>
+
+              <div className="md:hidden mb-6">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Doctor</span>
+                  <span>Date</span>
+                  <span>Info</span>
+                  <span>Consent</span>
+                  <span>Pay</span>
+                </div>
               </div>
             </div>
 
-            {/* Step 1: Consultation Type */}
-            {step === 1 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Select Consultation Type</CardTitle>
-                  <CardDescription>Choose how you want to consult with our doctors</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {CONSULTATION_TYPES.map((type) => {
-                      const Icon = type.icon;
-                      return (
-                        <div
-                          key={type.type}
-                          onClick={() => setConsultationType(type.type)}
-                          className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
-                            consultationType === type.type
-                              ? "border-gold bg-gold/5"
-                              : "border-border hover:border-gold/50"
-                          }`}
-                        >
-                          <Icon className="w-8 h-8 text-primary mb-3" />
-                          <h3 className="font-semibold text-lg mb-2">{type.label}</h3>
-                          <p className="text-sm text-muted-foreground mb-4">{type.duration}</p>
-                          <div className="text-2xl font-bold text-gold">₹{type.price}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 2: Select Doctor */}
-            {step === 2 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Select a Doctor</CardTitle>
-                  <CardDescription>Choose from our specialist doctors</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-3 max-h-96 overflow-y-auto">
-                    {doctors.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">Loading doctors...</p>
-                    ) : (
-                      doctors.map((doc) => (
-                        <div
-                          key={doc.doctorId}
-                          onClick={() => setSelectedDoctor(doc.doctorId)}
-                          className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                            selectedDoctor === doc.doctorId
-                              ? "border-gold bg-gold/5"
-                              : "border-border hover:border-gold/50"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h3 className="font-semibold text-lg">{doc.name}</h3>
-                              <p className="text-sm text-primary font-medium">{doc.specialty}</p>
-                              {doc.experience && (
-                                <p className="text-xs text-muted-foreground mt-1">{doc.experience}</p>
-                              )}
-                            </div>
-                            {selectedDoctor === doc.doctorId && (
-                              <Badge variant="default" className="bg-gold">Selected</Badge>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 3: Select Date & Time */}
-            {step === 3 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Select Date & Time</CardTitle>
-                  <CardDescription>Choose your preferred appointment slot</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-semibold mb-3">Preferred Date</label>
-                      <input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => {
-                          setSelectedDate(e.target.value);
-                          setSelectedSlot("");
-                        }}
-                        min={new Date().toISOString().split("T")[0]}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      />
-                    </div>
-
-                    {selectedDate && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-3">Time Slot</label>
-                        {loading ? (
-                          <p className="text-center text-muted-foreground py-8">Loading available slots...</p>
-                        ) : slots.length === 0 ? (
-                          <p className="text-center text-muted-foreground py-4">No slots available for this date</p>
+            <div className="md:col-span-3">
+              <div className="max-w-full">
+                {/* Step content cards */}
+                {/* Step 1: Select Doctor */}
+                {step === 1 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Select a Doctor</CardTitle>
+                      <CardDescription>Choose from our specialist doctors</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-h-[60vh] overflow-y-auto">
+                        {doctors.length === 0 ? (
+                          <div className="col-span-full text-center text-muted-foreground py-6">Loading doctors...</div>
                         ) : (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                            {slots.map((slot) => (
-                              <button
-                                key={slot.time}
-                                onClick={() => !slot.isBooked && setSelectedSlot(slot.time)}
-                                disabled={slot.isBooked}
-                                className={`p-3 border-2 rounded-lg text-sm font-medium transition-all ${
-                                  slot.isBooked
-                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed border-border"
-                                    : selectedSlot === slot.time
-                                    ? "bg-gold text-white border-gold"
-                                    : "border-border hover:border-gold"
-                                }`}
-                              >
-                                {slot.time}
-                              </button>
-                            ))}
+                          doctors.map((doc) => (
+                            <div
+                              key={doc.doctorId}
+                              onClick={() => setSelectedDoctor(doc.doctorId)}
+                              className={`p-4 border rounded-xl cursor-pointer transition-shadow hover:shadow-md ${selectedDoctor === doc.doctorId ? 'border-gold bg-gold/5' : 'border-border'}`}>
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex items-start gap-3">
+                                  {/* Doctor photo (mapped from clinic data by name) */}
+                                  {(() => {
+                                    const match = clinicDoctors.find((c) => c.name === doc.name);
+                                    if (!match?.image) return null;
+                                    return (
+                                      <img
+                                        src={match.image}
+                                        alt={doc.name}
+                                        className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gold/60 shadow-sm"
+                                      />
+                                    );
+                                  })()}
+                                  <div>
+                                    <h3 className="font-semibold text-lg">{doc.name}</h3>
+                                    <p className="text-sm text-primary font-medium">{doc.specialty}</p>
+                                    {doc.experience && <p className="text-xs text-muted-foreground mt-1">{doc.experience}</p>}
+                                  </div>
+                                </div>
+                                {selectedDoctor === doc.doctorId && (
+                                  <Badge variant="default" className="bg-gold">Selected</Badge>
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Step 2: Select Date & Time */}
+                {step === 2 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Select Date & Time</CardTitle>
+                      <CardDescription>Choose your preferred appointment slot</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">Preferred Date</label>
+                          <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => { setSelectedDate(e.target.value); setSelectedSlot(""); }}
+                            min={new Date().toISOString().split("T")[0]}
+                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          />
+                        </div>
+
+                        {selectedDate && (
+                          <div>
+                            <label className="block text-sm font-semibold mb-2">Available Slots</label>
+                            {loading ? (
+                              <div className="text-center text-muted-foreground py-6">Loading available slots...</div>
+                            ) : slots.length === 0 ? (
+                              <div className="text-center text-muted-foreground py-4">No slots available for this date</div>
+                            ) : (
+                              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                                {slots.map((slot) => (
+                                  <button
+                                    key={slot.time}
+                                    onClick={() => !slot.isBooked && setSelectedSlot(slot.time)}
+                                    disabled={slot.isBooked}
+                                    className={`p-3 rounded-lg text-sm font-medium transition ${slot.isBooked ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : selectedSlot === slot.time ? 'bg-gold text-white' : 'border border-border hover:border-gold'}`}>
+                                    {slot.time}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 4: Patient Information */}
-            {step === 4 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Information</CardTitle>
-                  <CardDescription>Please provide your details for the consultation</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Full Name *</label>
-                      <input
-                        type="text"
-                        placeholder="John Doe"
-                        value={formData.patientName}
-                        onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Phone *</label>
-                      <input
-                        type="tel"
-                        placeholder="+91 9876543210"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Email</label>
-                      <input
-                        type="email"
-                        placeholder="john@example.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Symptoms *</label>
-                      <textarea
-                        placeholder="Describe your symptoms in detail..."
-                        value={formData.symptoms}
-                        onChange={(e) => setFormData({ ...formData, symptoms: e.target.value })}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 5: Payment */}
-            {step === 5 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Complete Payment</CardTitle>
-                  <CardDescription>Secure payment via Stripe</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {/* Order Summary */}
-                    <div className="bg-muted rounded-lg p-4 space-y-3">
-                      <div className="flex justify-between text-sm">
-                        <span>Consultation Type:</span>
-                        <span className="font-semibold">
-                          {CONSULTATION_TYPES.find(c => c.type === consultationType)?.label}
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Doctor:</span>
-                        <span className="font-semibold">{selectedDoctorInfo?.name}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Date & Time:</span>
-                        <span className="font-semibold">{selectedDate} at {selectedSlot}</span>
-                      </div>
-                      <div className="border-t pt-3 flex justify-between">
-                        <span className="font-semibold">Total Amount:</span>
-                        <span className="text-2xl font-bold text-gold">₹{currentPrice}</span>
-                      </div>
-                    </div>
-
-                    <Button
-                      variant="gold"
-                      onClick={handleStripePayment}
-                      disabled={paymentProcessing}
-                      className="w-full py-6 text-lg"
-                    >
-                      {paymentProcessing ? "Processing..." : `Pay ₹${currentPrice} with Stripe`}
-                    </Button>
-
-                    <p className="text-xs text-muted-foreground text-center">
-                      Your payment is secure and encrypted. We accept Visa, Mastercard, and American Express.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 6: Confirmation */}
-            {step === 6 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-center">Consultation Booked Successfully!</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center space-y-6">
-                  <div className="inline-block p-4 bg-gold/10 rounded-full">
-                    <CheckCircle2 className="w-12 h-12 text-gold" />
-                  </div>
-                  
-                  <div className="bg-muted rounded-lg p-4 space-y-3 text-left">
-                    <h3 className="font-semibold">Consultation Details</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Type:</span>
-                        <span>{CONSULTATION_TYPES.find(c => c.type === consultationType)?.label}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Doctor:</span>
-                        <span>{selectedDoctorInfo?.name}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Date & Time:</span>
-                        <span>{selectedDate} at {selectedSlot}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Confirmation ID:</span>
-                        <span className="font-mono">{consultationId}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground">
-                    A confirmation email has been sent to <span className="font-semibold">{formData.email}</span>
-                  </p>
-
-                  <Button
-                    variant="gold"
-                    onClick={() => navigate("/")}
-                    className="w-full"
-                  >
-                    Back to Home
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Navigation Buttons */}
-            {step < 6 && (
-              <div className="flex justify-between mt-8">
-                <Button
-                  variant="outline"
-                  onClick={() => setStep(step - 1)}
-                  disabled={step === 1}
-                  className="flex items-center gap-2"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back
-                </Button>
-                {step < 5 && (
-                  <Button
-                    variant="gold"
-                    onClick={handleContinue}
-                    disabled={loading}
-                    className="flex items-center gap-2"
-                  >
-                    Continue
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
+                    </CardContent>
+                  </Card>
                 )}
+
+                {/* Step 3: Patient Information */}
+                {step === 3 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Your Information</CardTitle>
+                      <CardDescription>Please provide your details for the consultation</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">Full Name *</label>
+                          <input type="text" value={formData.patientName} onChange={(e) => setFormData({ ...formData, patientName: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">Phone *</label>
+                          <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">Email</label>
+                          <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-semibold mb-2">Symptoms *</label>
+                          <textarea value={formData.symptoms} onChange={(e) => setFormData({ ...formData, symptoms: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" rows={5} />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Step 4: Consent */}
+                {step === 4 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Consent & Legal Acknowledgement</CardTitle>
+                      <CardDescription>Please review and accept the consent form before payment</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <p className="text-sm text-blue-900"><strong>Important:</strong> You must accept the patient consent declaration to proceed with payment. This ensures you understand the limitations and scope of the consultation.</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Step 5: Payment */}
+                {step === 5 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Complete Payment</CardTitle>
+                      <CardDescription>Secure payment via Stripe</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div className="bg-muted rounded-lg p-4 space-y-3">
+                          <div className="flex justify-between text-sm"><span>Consultation Type:</span><span className="font-semibold">{CONSULTATION_TYPES.find(c => c.type === consultationType)?.label}</span></div>
+                          <div className="flex justify-between text-sm"><span>Doctor:</span><span className="font-semibold">{selectedDoctorInfo?.name}</span></div>
+                          <div className="flex justify-between text-sm"><span>Date & Time:</span><span className="font-semibold">{selectedDate} at {selectedSlot}</span></div>
+                          <div className="border-t pt-3 flex justify-between"><span className="font-semibold">Total Amount:</span><span className="text-2xl font-bold text-gold">₹{currentPrice}</span></div>
+                        </div>
+                        <Button variant="gold" onClick={handleStripePayment} disabled={paymentProcessing} className="w-full py-4 text-lg">{paymentProcessing ? 'Processing...' : `Pay ₹${currentPrice}`}</Button>
+                        <p className="text-xs text-muted-foreground text-center">Your payment is secure and encrypted. We accept major cards.</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Step 6: Confirmation */}
+                {step === 6 && (
+                  <Card>
+                    <CardHeader><CardTitle className="text-center">Consultation Booked Successfully!</CardTitle></CardHeader>
+                    <CardContent className="text-center space-y-6">
+                      <div className="inline-block p-4 bg-gold/10 rounded-full"><CheckCircle2 className="w-12 h-12 text-gold" /></div>
+                      <div className="bg-muted rounded-lg p-4 space-y-3 text-left">
+                        <h3 className="font-semibold">Consultation Details</h3>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between"><span className="text-muted-foreground">Type:</span><span>{CONSULTATION_TYPES.find(c=>c.type===consultationType)?.label}</span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Doctor:</span><span>{selectedDoctorInfo?.name}</span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Date & Time:</span><span>{selectedDate} at {selectedSlot}</span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Confirmation ID:</span><span className="font-mono">{consultationId}</span></div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">A confirmation email has been sent to <span className="font-semibold">{formData.email}</span></p>
+                      <Button variant="gold" onClick={() => navigate('/')} className="w-full">Back to Home</Button>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Navigation Buttons */}
+                {step < 6 && (
+                  <div className="flex justify-between mt-6">
+                    <Button variant="outline" onClick={() => setStep(step - 1)} disabled={step === 1}>
+                      <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                    </Button>
+                    {step < 5 ? (
+                      <Button variant="gold" onClick={handleContinue} disabled={loading}>Continue <ArrowRight className="w-4 h-4 ml-2" /></Button>
+                    ) : null}
+                  </div>
+                )}
+                {/* Consent modal (gates payment) */}
+                <ConsentForm
+                  open={showConsentForm}
+                  onClose={() => setShowConsentForm(false)}
+                  onAccept={(data: any) => {
+                    setConsentData(data);
+                    setShowConsentForm(false);
+                    setStep(5);
+                  }}
+                />
               </div>
-            )}
+            </div>
           </div>
         </div>
       </section>

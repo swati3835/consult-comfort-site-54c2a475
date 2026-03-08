@@ -65,24 +65,15 @@ const Contact = () => {
                   Contact Information
                 </h2>
                 <p className="text-muted-foreground leading-relaxed mb-8">
-                  Visit us at our Harley Street location or get in touch using the 
+                 Get in touch using the 
                   contact details below.
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-sky flex items-center justify-center shrink-0">
-                    <MapPin className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-1">Address</h4>
-                    <p className="text-muted-foreground text-sm">
-                      123 Harley Street<br />
-                      London, W1G 6AX<br />
-                      United Kingdom
-                    </p>
-                  </div>
+                 
+                 
                 </div>
 
                 <div className="flex gap-4">
@@ -91,8 +82,8 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Phone</h4>
-                    <a href="tel:+441234567890" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                      +44 123 456 789
+                    <a href="tel:+917409466222" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                      +91 74094 66222
                     </a>
                   </div>
                 </div>
@@ -103,24 +94,15 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Email</h4>
-                    <a href="mailto:info@kaantclinic.co.uk" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                      info@kaantclinic.co.uk
+                    <a href="mailto:kanthealthcare@gmail.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                      kanthealthcare@gmail.com
                     </a>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-sky flex items-center justify-center shrink-0">
-                    <Clock className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-1">Opening Hours</h4>
-                    <p className="text-muted-foreground text-sm">
-                      Mon - Fri: 8:00 - 20:00<br />
-                      Saturday: 9:00 - 17:00<br />
-                      Sunday: Closed
-                    </p>
-                  </div>
+                 
+                 
                 </div>
               </div>
             </div>
@@ -155,7 +137,6 @@ const Contact = () => {
                           <Input
                             id="firstName"
                             name="firstName"
-                            placeholder="John"
                             required
                             className="h-12"
                           />
@@ -165,7 +146,6 @@ const Contact = () => {
                           <Input
                             id="lastName"
                             name="lastName"
-                            placeholder="Smith"
                             required
                             className="h-12"
                           />
@@ -179,7 +159,6 @@ const Contact = () => {
                             id="email"
                             name="email"
                             type="email"
-                            placeholder="john@example.com"
                             required
                             className="h-12"
                           />
@@ -190,7 +169,6 @@ const Contact = () => {
                             id="phone"
                             name="phone"
                             type="tel"
-                            placeholder="+44 123 456 789"
                             className="h-12"
                           />
                         </div>
@@ -201,7 +179,6 @@ const Contact = () => {
                         <Input
                           id="subject"
                           name="subject"
-                          placeholder="How can we help you?"
                           required
                           className="h-12"
                         />
@@ -212,7 +189,6 @@ const Contact = () => {
                         <Textarea
                           id="message"
                           name="message"
-                          placeholder="Please describe your enquiry..."
                           required
                           rows={6}
                           className="resize-none"

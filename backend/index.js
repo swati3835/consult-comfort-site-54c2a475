@@ -27,10 +27,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api/second-opinion', require('./routes/secondOpinion'));
 app.use('/api/consultation', require('./routes/consultation'));
+app.use('/api/document-upload', require('./routes/documentUpload'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/doctor', require('./routes/doctor'));
 app.use('/api/chatbot', require('./routes/chatbot'));
+app.use('/api/prescription', require('./routes/prescription'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
@@ -39,60 +41,39 @@ async function seedDoctors() {
     const count = await prisma.doctor.count();
     if (count === 0) {
       const hashedPassword = await bcrypt.hash('doctor123', 10);
+      // Seed with the same core doctors that are shown on the marketing site
+      // (see src/data/clinic-data.ts) so the experience is consistent everywhere.
       const doctors = [
         {
-          doctorId: '1',
-          name: 'Dr. James Whitmore',
-          specialty: 'Consultant Cardiologist',
+          doctorId: 'DR-BHARAT',
+          name: 'Dr. Bharat',
+          specialty: 'Non Interventional Cardiologist',
           department: 'cardiology',
-          experience: '25+ years',
-          qualifications: 'MBBS, MD, FRCP',
-          bio: 'Leading cardiologist with extensive interventional experience',
-          email: 'james.whitmore@kanthealth.com',
-          password: hashedPassword,
-          licenseNumber: 'LIC-2024-001',
-          phone: '+91-9876543210'
-        },
-        {
-          doctorId: '2',
-          name: 'Dr. Priya Sharma',
-          specialty: 'Consultant Physician',
-          department: 'general-medicine',
-          experience: '18+ years',
-          qualifications: 'MBBS, MRCP, PhD',
-          email: 'priya.sharma@kanthealth.com',
-          password: hashedPassword,
-          licenseNumber: 'LIC-2024-002',
-          phone: '+91-9876543211'
-        },
-        {
-          doctorId: '3',
-          name: 'Dr. Michael Okonkwo',
-          specialty: 'Consultant Orthopaedic Surgeon',
-          department: 'orthopedics',
           experience: '15+ years',
-          qualifications: 'MBChB, FRCS (Orth)',
-          email: 'michael.okonkwo@kanthealth.com',
+          qualifications: 'MBBS, DM Cardiology, FACC',
+          bio: 'Experienced non-interventional cardiologist specialising in cardiac diagnostics, heart failure management, and preventive cardiology.',
+          email: 'dr.bharat@kanthealth.com',
           password: hashedPassword,
-          licenseNumber: 'LIC-2024-003',
-          phone: '+91-9876543212'
+          licenseNumber: 'LIC-KANT-0001',
+          phone: '+91-9999990001'
         },
         {
-          doctorId: '4',
-          name: 'Dr. Elizabeth Hayes',
-          specialty: 'Consultant Dermatologist',
-          department: 'dermatology',
-          experience: '12+ years',
-          qualifications: 'MBBS, MRCP (Derm)',
-          email: 'elizabeth.hayes@kanthealth.com',
+          doctorId: 'DR-CHANDRAKANT',
+          name: 'Dr. Chandrakant',
+          specialty: 'Surgeon',
+          department: 'surgery',
+          experience: '20+ years',
+          qualifications: 'MBBS, MS General Surgery, FICS',
+          bio: 'Highly skilled surgeon with extensive expertise in general and specialised surgical procedures, focused on optimal patient outcomes.',
+          email: 'dr.chandrakant@kanthealth.com',
           password: hashedPassword,
-          licenseNumber: 'LIC-2024-004',
-          phone: '+91-9876543213'
+          licenseNumber: 'LIC-KANT-0002',
+          phone: '+91-9999990002'
         }
       ];
       await prisma.doctor.createMany({ data: doctors });
-      console.log('✓ Seeded 4 doctors');
-      console.log('  Test login: james.whitmore@kanthealth.com / doctor123');
+      console.log(`✓ Seeded ${doctors.length} doctors`);
+      console.log('  Test login (example): dr.bharat@kanthealth.com / doctor123');
     }
   } catch (err) {
     console.warn('⚠ Seeding failed:', err.message);

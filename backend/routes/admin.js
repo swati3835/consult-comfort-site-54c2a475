@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 // POST /api/admin/login
+// Supports both regular admin and superadmin, distinguished via env vars.
 router.post('/login',
   body('email').isEmail().withMessage('Valid email required'),
   body('password').notEmpty().withMessage('Password required'),
@@ -16,14 +17,26 @@ router.post('/login',
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     const { email, password } = req.body;
+
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
+    const superAdminEmail = process.env.SUPERADMIN_EMAIL;
+    const superAdminPassword = process.env.SUPERADMIN_PASSWORD;
+
+    let role = null;
 
     if (email === adminEmail && password === adminPassword) {
-      const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '8h' });
-      return res.json({ token });
+      role = 'admin';
+    } else if (email === superAdminEmail && password === superAdminPassword) {
+      role = 'superadmin';
     }
-    return res.status(401).json({ message: 'Invalid credentials' });
+
+    if (!role) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ email, role }, JWT_SECRET, { expiresIn: '8h' });
+    return res.json({ token, role });
   }
 );
 

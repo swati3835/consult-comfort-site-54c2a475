@@ -4,47 +4,37 @@
  import { 
    Phone, 
    Video, 
-   Heart,
-   Baby,
-   Bone,
-   Users,
+   FileText,
    Award, 
    Clock, 
    Shield,
    ArrowRight,
    Star
  } from "lucide-react";
- import heroImage from "@/assets/hero-clinic.jpg";
+ import heroImage from "@/assets/HeroImg.png";
  import { doctors, departments } from "@/data/clinic-data";
- 
- const services = [
-   {
-     icon: Phone,
-     title: "Voice Consultation",
-     description: "Connect with our doctors via secure voice call for expert medical advice.",
-     href: "/book",
-     price: "₹500",
-   },
-   {
-     icon: Video,
-     title: "Video Consultation",
-     description: "Face-to-face consultation via secure HD video call.",
-     href: "/book",
-     price: "₹800",
-   },
-   {
-     icon: Heart,
-     title: "Cardiology",
-     description: "Expert heart and cardiovascular care from specialist doctors.",
-     href: "/book",
-   },
-   {
-     icon: Bone,
-     title: "Orthopedics",
-     description: "Bone, joint and muscle care with experienced surgeons.",
-     href: "/book",
-   },
- ];
+// import { LetterheadDownload } from "@/components/LetterheadDownload";
+
+const services = [
+  {
+    icon: Phone,
+    title: "Board Review ",
+    description: "Connect with our doctors via secure voice call for expert medical advice.",
+    href: "/book",
+  },
+  {
+    icon: Video,
+    title: "Video Consultation",
+    description: "Face-to-face consultation via secure HD video call.",
+    href: "/book",
+  },
+  {
+    icon: FileText,
+    title: "Second Opinion",
+    description: "Expert review of your medical records and case by specialist doctors.",
+    href: "/second-opinion",
+  },
+];
 
 const stats = [
   { value: "25+", label: "Years of Excellence" },
@@ -73,17 +63,19 @@ const Index = () => {
              Welcome to KANT Healthcare
             </span>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 animate-slide-up">
-             Expert Medical 
-             <span className="block text-gold">Second Opinions</span>
+             Experience Excellence in 
+             <span className="block text-gold">Teleconsultation And</span>
+
+             <span className="block text-gold">Medical Second Opinion</span>
             </h1>
             <p className="text-lg text-white/80 leading-relaxed mb-8 animate-slide-up" style={{ animationDelay: "0.1s" }}>
-             Get expert medical consultations from specialist doctors via voice or video call. 
-             Easy online booking, secure payments, and quality healthcare from the comfort of your home.
+             Get expert medical consultation from specialist doctors. 
+             Easy online booking, secure payment and quality healthcare from the comfort of your home.
             </p>
             <div className="flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: "0.2s" }}>
               <Link to="/book">
                 <Button variant="hero" size="xl">
-                  Book Appointment
+                  Book Now
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
@@ -97,28 +89,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 bg-primary">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-           {[
-             { value: "15+", label: "Specialist Doctors" },
-             { value: "10,000+", label: "Consultations" },
-             { value: "6", label: "Departments" },
-             { value: "98%", label: "Patient Satisfaction" },
-           ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="font-serif text-3xl md:text-4xl font-bold text-gold mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-white/70 text-sm uppercase tracking-wider">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+  
 
       {/* Services Section */}
       <section className="py-20 bg-background">
@@ -136,7 +107,8 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex justify-center">
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl w-full">
             {services.map((service, index) => (
               <Link
                 key={index}
@@ -152,13 +124,9 @@ const Index = () => {
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                   {service.description}
                 </p>
-                {service.price && (
-                  <span className="inline-block px-3 py-1 bg-gold/10 text-gold rounded-full text-sm font-medium">
-                    From {service.price}
-                  </span>
-                )}
               </Link>
             ))}
+            </div>
           </div>
         </div>
       </section>
@@ -191,7 +159,7 @@ const Index = () => {
                 </div>
                 <div className="flex gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <Users className="w-6 h-6 text-primary" />
+                    {/* <Users className="w-6 h-6 text-primary" /> */}
                   </div>
                   <div>
                    <h4 className="font-semibold text-foreground mb-1">Easy Booking</h4>
@@ -262,7 +230,14 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex justify-center">
+            <div className={`grid gap-6 ${
+              doctors.length <= 2 
+                ? 'md:grid-cols-2 max-w-2xl'
+                : doctors.length === 3
+                ? 'md:grid-cols-3 max-w-4xl'
+                : 'md:grid-cols-2 lg:grid-cols-4 w-full'
+            }`}>
            {doctors.slice(0, 4).map((doctor, index) => (
               <div
                 key={index}
@@ -288,6 +263,7 @@ const Index = () => {
                 </div>
               </div>
             ))}
+            </div>
           </div>
 
           <div className="text-center mt-12">
@@ -301,6 +277,7 @@ const Index = () => {
         </div>
       </section>
 
+    
       {/* CTA Section */}
       <section className="py-20 hero-gradient">
         <div className="container mx-auto px-4 text-center">

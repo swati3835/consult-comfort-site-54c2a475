@@ -9,6 +9,7 @@ import Doctors from "./pages/Doctors";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import Book from "./pages/Book";
+import BookNow from "./pages/BookNow";
 import Consultation from "./pages/Consultation";
 import SecondOpinion from "./pages/SecondOpinion";
 import DocumentUpload from "./pages/DocumentUpload";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/book" element={<Book />} />
+          <Route path="/book-now" element={<BookNow />} />
           <Route path="/consultation" element={<Consultation />} />
           <Route path="/second-opinion" element={<SecondOpinion />} />
           <Route path="/document-upload" element={<DocumentUpload />} />
