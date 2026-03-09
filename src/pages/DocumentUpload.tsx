@@ -7,14 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Upload, X, CheckCircle2, ArrowLeft, ArrowRight, FileText } from "lucide-react";
 import ConsentForm from "@/components/ConsentForm";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 declare global {
   interface Window {
-    Stripe: any;
+    Razorpay: any;
   }
 }
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-const STRIPE_PUB_KEY = import.meta.env.VITE_STRIPE_PUB_KEY || "";
 
 const DocumentUpload = () => {
   const navigate = useNavigate();
@@ -98,12 +96,12 @@ const DocumentUpload = () => {
     }
   };
 
-  const handleStripePayment = async () => {
+  const handleRazorpayPayment = async () => {
     try {
       setPaymentProcessing(true);
 
-      // Create payment intent
-      const intentRes = await fetch(`${BACKEND_URL}/api/payment/stripe/create-intent`, {
+      // Create Razorpay order
+      const orderRes = await fetch(`${BACKEND_URL}/api/payment/razorpay/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -113,75 +111,59 @@ const DocumentUpload = () => {
         })
       });
 
-      const intentData = await intentRes.json();
-      if (!intentRes.ok) throw new Error(intentData.message);
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) throw new Error(orderData.message || "Failed to create payment order");
 
-      const { clientSecret } = intentData;
+      const { orderId, amount, currency, keyId } = orderData;
 
-      // Load Stripe
+      // Load Razorpay
       const script = document.createElement("script");
-      script.src = "https://js.stripe.com/v3/";
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.async = true;
       script.onload = async () => {
-        const stripe = window.Stripe(STRIPE_PUB_KEY);
-        const elements = stripe.elements();
-        const cardElement = elements.create("card");
-
-        const modal = document.createElement("div");
-        modal.style.cssText =
-          "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999";
-        modal.innerHTML = `
-          <div style="background:white;padding:40px;border-radius:8px;max-width:400px;width:100%;">
-            <h2 style="margin:0 0 20px 0;font-size:24px;">Enter Card Details</h2>
-            <div id="card-element" style="border:1px solid #ccc;padding:10px;border-radius:4px;margin-bottom:20px;"></div>
-            <div id="card-errors" style="color:red;margin-bottom:10px;"></div>
-            <button id="pay-btn" style="width:100%;padding:10px;background:#007bff;color:white;border:none;border-radius:4px;cursor:pointer;">Pay ₹${currentFee}</button>
-          </div>
-        `;
-        document.body.appendChild(modal);
-
-        cardElement.mount("#card-element");
-
-        const payBtn = modal.querySelector("#pay-btn") as HTMLButtonElement;
-        const cardErrors = modal.querySelector("#card-errors") as HTMLDivElement;
-
-        payBtn.onclick = async () => {
-          payBtn.disabled = true;
-          payBtn.textContent = "Processing...";
-
-          const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: { card: cardElement }
-          });
-
-          if (error) {
-            cardErrors.textContent = error.message;
-            payBtn.disabled = false;
-            payBtn.textContent = `Pay ₹${currentFee}`;
-          } else if (paymentIntent.status === "succeeded") {
-            const verifyRes = await fetch(`${BACKEND_URL}/api/payment/stripe/verify`, {
+        const options = {
+          key: keyId,
+          amount,
+          currency,
+          name: "Consult Comfort",
+          description: "Document Upload Payment",
+          order_id: orderId,
+          prefill: {
+            name: "Patient",
+          },
+          theme: {
+            color: "#0f766e",
+          },
+          handler: async (response: any) => {
+            const verifyRes = await fetch(`${BACKEND_URL}/api/payment/razorpay/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                paymentIntentId: paymentIntent.id,
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
                 type: "document-upload",
-                refId: uploadId
-              })
+                refId: uploadId,
+              }),
             });
 
             if (verifyRes.ok) {
-              modal.remove();
               setStep(5);
               toast({
                 title: "Success",
-                description: "Documents uploaded and payment completed successfully!"
+                description: "Documents uploaded and payment completed successfully!",
               });
             } else {
-              cardErrors.textContent = "Verification failed";
-              payBtn.disabled = false;
-              payBtn.textContent = `Pay ₹${currentFee}`;
+              toast({
+                title: "Error",
+                description: "Payment verification failed. Please contact support.",
+              });
             }
-          }
+          },
         };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
       };
       document.head.appendChild(script);
     } catch (err: any) {
@@ -397,7 +379,7 @@ const DocumentUpload = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Complete Payment</CardTitle>
-                  <CardDescription>Secure payment via Stripe</CardDescription>
+                  <CardDescription>Secure payment via Razorpay</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
@@ -418,11 +400,11 @@ const DocumentUpload = () => {
 
                     <Button
                       variant="gold"
-                      onClick={handleStripePayment}
+                      onClick={handleRazorpayPayment}
                       disabled={paymentProcessing}
                       className="w-full py-6 text-lg"
                     >
-                      {paymentProcessing ? "Processing..." : `Pay ₹${currentFee} with Stripe`}
+                      {paymentProcessing ? "Processing..." : `Pay ₹${currentFee}`}
                     </Button>
 
                     <p className="text-xs text-muted-foreground text-center">
