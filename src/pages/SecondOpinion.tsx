@@ -616,10 +616,9 @@ const SecondOpinion = () => {
               onClose={() => setShowConsentForm(false)} 
               onAccept={handleConsentAccept}
             />
+            </div>
           </div>
         </div>
-      </div>
-    </div>
       </section>
     </Layout>
   );
