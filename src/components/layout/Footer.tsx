@@ -49,19 +49,7 @@ const Footer = () => {
             </nav>
           </div>
 
-          {/* Services */}
-          <div>
-           <h4 className="font-serif text-lg font-semibold mb-6">Departments</h4>
-            <nav className="flex flex-col gap-3">
-             <span className="text-white/70 text-sm">Cardiology</span>
-             <span className="text-white/70 text-sm">Pediatrics</span>
-             <span className="text-white/70 text-sm">Orthopedics</span>
-             <span className="text-white/70 text-sm">Gynecology</span>
-             <span className="text-white/70 text-sm">Dermatology</span>
-             <span className="text-white/70 text-sm">General Medicine</span>
-            </nav>
-          </div>
-
+      
           {/* Contact Info */}
           <div>
             <h4 className="font-serif text-lg font-semibold mb-6">Contact Us</h4>
@@ -70,30 +58,21 @@ const Footer = () => {
                 <MapPin className="w-5 h-5 text-gold mt-0.5" />
                 <p className="text-white/70 text-sm">
                  KANT Healthcare<br />
-                 Mumbai, Maharashtra<br />
-                 India
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-gold" />
-               <a href="tel:+919876543210" className="text-white/70 hover:text-gold transition-colors text-sm">
-                 +91 98765 43210
+               <a href="tel:+917409466222" className="text-white/70 hover:text-gold transition-colors text-sm">
+                 +91 7409466222
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold" />
-               <a href="mailto:info@kanthealthcare.com" className="text-white/70 hover:text-gold transition-colors text-sm">
-                 info@kanthealthcare.com
+               <a href="mailto:kanthealthcare@gmail.com" className="text-white/70 hover:text-gold transition-colors text-sm">
+                kanthealthcare@gmail.com
                 </a>
               </div>
-              <div className="flex items-start gap-3">
-                <Clock className="w-5 h-5 text-gold mt-0.5" />
-                <p className="text-white/70 text-sm">
-                  Mon - Fri: 8:00 - 20:00<br />
-                  Saturday: 9:00 - 17:00<br />
-                  Sunday: Closed
-                </p>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -107,6 +86,7 @@ const Footer = () => {
              © 2024 KANT Healthcare. All rights reserved.
             </p>
             <div className="flex gap-6">
+              <Link to="/refund-policy" className="text-white/50 hover:text-gold transition-colors text-sm">Refund Policy</Link>
               <a href="#" className="text-white/50 hover:text-gold transition-colors text-sm">Privacy Policy</a>
               <a href="#" className="text-white/50 hover:text-gold transition-colors text-sm">Terms of Service</a>
               <a href="#" className="text-white/50 hover:text-gold transition-colors text-sm">Cookie Policy</a>

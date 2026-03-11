@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -204,13 +204,19 @@ const SecondOpinion = () => {
                         step > s.num
                           ? "bg-gold text-white"
                           : step === s.num
-                          ? "bg-primary text-white"
-                          : "bg-muted text-muted-foreground"
+                            ? "bg-primary text-white"
+                            : "bg-muted text-muted-foreground"
                       }`}
                     >
-                      {step > s.num ? <CheckCircle2 className="w-4 h-4" /> : s.num}
+                      {step > s.num ? (
+                        <CheckCircle2 className="w-4 h-4" />
+                      ) : (
+                        s.num
+                      )}
                     </div>
-                    <div className="text-sm text-muted-foreground">{s.label}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {s.label}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -233,78 +239,112 @@ const SecondOpinion = () => {
               <div className="max-w-full">
                 {/* Step 1: Personal Information */}
                 {step === 1 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Personal Information</CardTitle>
-                      <CardDescription>Please provide your details</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-semibold mb-2">Full Name *</label>
-                          <input
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) =>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Personal Information</CardTitle>
+                          <CardDescription>
+                        Please provide your details
+                      </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-semibold mb-2">
+                            Full Name *
+                          </label>
+                              <input
+                                type="text"
+                                value={formData.name}
+                                onChange={(e) =>
+                             
                               setFormData({ ...formData, name: e.target.value })
+                            
                             }
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                          />
-                        </div>
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                              />
+                            </div>
 
-                        <div>
-                          <label className="block text-sm font-semibold mb-2">Phone *</label>
-                          <input
-                            type="tel"
-                            value={formData.phone}
-                            onChange={(e) =>
-                              setFormData({ ...formData, phone: e.target.value })
+                            <div>
+                              <label className="block text-sm font-semibold mb-2">
+                            Phone *
+                          </label>
+                              <input
+                                type="tel"
+                                value={formData.phone}
+                                onChange={(e) =>
+                             
+                              setFormData({
+                                ...formData,
+                                phone: e.target.value,
+                              })
+                            
                             }
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                          />
-                        </div>
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                              />
+                            </div>
 
-                        <div>
-                          <label className="block text-sm font-semibold mb-2">Email *</label>
-                          <input
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) =>
-                              setFormData({ ...formData, email: e.target.value })
+                            <div>
+                              <label className="block text-sm font-semibold mb-2">
+                            Email *
+                          </label>
+                              <input
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) =>
+                             
+                              setFormData({
+                                ...formData,
+                                email: e.target.value,
+                              })
+                            
                             }
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                          />
-                        </div>
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                              />
+                            </div>
 
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-semibold mb-2">Age</label>
-                            <input
-                              type="number"
-                              value={formData.age}
-                              onChange={(e) =>
-                                setFormData({ ...formData, age: e.target.value })
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-semibold mb-2">
+                              Age
+                            </label>
+                                <input
+                                  type="number"
+                                  value={formData.age}
+                                  onChange={(e) =>
+                               
+                                setFormData({
+                                  ...formData,
+                                  age: e.target.value,
+                                })
+                              
                               }
-                              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            />
-                          </div>
+                                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                />
+                              </div>
 
-                          <div>
-                            <label className="block text-sm font-semibold mb-2">Gender</label>
-                            <select
-                              value={formData.gender}
-                              onChange={(e) =>
-                                setFormData({ ...formData, gender: e.target.value })
+                              <div>
+                                <label className="block text-sm font-semibold mb-2">
+                              Gender
+                            </label>
+                                <select
+                                  value={formData.gender}
+                                  onChange={(e) =>
+                               
+                                setFormData({
+                                  ...formData,
+                                  gender: e.target.value,
+                                })
+                              
                               }
-                              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            >
-                              <option value="">Select</option>
-                              <option value="male">Male</option>
-                              <option value="female">Female</option>
-                              <option value="other">Other</option>
-                            </select>
-                          </div>
-                        </div>
+                                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                >
+                                  <option value="">Select</option>
+                                  <option value="male">Male</option>
+                                  <option value="female">Female</option>
+                                  <option value="other">Other</option>
+                                </select>
+                              </div>
+                            </div>
 
                         <div>
                           <label className="block text-sm font-semibold mb-2">
@@ -330,30 +370,39 @@ const SecondOpinion = () => {
                   </Card>
                 )}
 
-                {/* Step 2: Upload Documents */}
-                {step === 2 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Upload Medical Documents</CardTitle>
-                      <CardDescription>
+                    {/* Step 2: Upload Documents */}
+                    {step === 2 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Upload Medical Documents</CardTitle>
+                          <CardDescription>
+                        
                         Please provide your medical records for review
+                      
                       </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-semibold mb-2">
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-semibold mb-2">
+                            
                             Medical Condition Description *
+                          
                           </label>
-                          <textarea
-                            value={formData.remarks}
-                            onChange={(e) =>
-                              setFormData({ ...formData, remarks: e.target.value })
+                              <textarea
+                                value={formData.remarks}
+                                onChange={(e) =>
+                             
+                              setFormData({
+                                ...formData,
+                                remarks: e.target.value,
+                              })
+                            
                             }
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            rows={4}
-                          />
-                        </div>
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                rows={4}
+                              />
+                            </div>
 
                         <div>
                           <label className="block text-sm font-semibold mb-3">
@@ -412,46 +461,60 @@ const SecondOpinion = () => {
                   </Card>
                 )}
 
-                {/* Step 3: Review */}
-                {step === 3 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Review Your Information</CardTitle>
-                      <CardDescription>
+                    {/* Step 3: Review */}
+                    {step === 3 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Review Your Information</CardTitle>
+                          <CardDescription>
+                        
                         Please verify all details before proceeding to payment
+                      
                       </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-6">
-                        <div className="bg-muted rounded-lg p-4 space-y-3">
-                          <h3 className="font-semibold">Personal Information</h3>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Name:</span>
-                              <span>{formData.name}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Phone:</span>
-                              <span>{formData.phone}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Email:</span>
-                              <span>{formData.email}</span>
-                            </div>
-                            {formData.age && (
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Age:</span>
-                                <span>{formData.age}</span>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-6">
+                            <div className="bg-muted rounded-lg p-4 space-y-3">
+                              <h3 className="font-semibold">
+                            Personal Information
+                          </h3>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">
+                                Name:
+                              </span>
+                                  <span>{formData.name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">
+                                Phone:
+                              </span>
+                                  <span>{formData.phone}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">
+                                Email:
+                              </span>
+                                  <span>{formData.email}</span>
+                                </div>
+                                {formData.age && (
+                                  <div className="flex justify-between">
+                                    <span className="text-muted-foreground">
+                                  Age:
+                                </span>
+                                    <span>{formData.age}</span>
+                                  </div>
+                                )}
+                                {formData.gender && (
+                                  <div className="flex justify-between">
+                                    <span className="text-muted-foreground">
+                                  Gender:
+                                </span>
+                                    <span>{formData.gender}</span>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                            {formData.gender && (
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Gender:</span>
-                                <span>{formData.gender}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                            </div>
 
                         <div className="bg-muted rounded-lg p-4 space-y-3">
                           <h3 className="font-semibold">Documents</h3>
@@ -468,83 +531,98 @@ const SecondOpinion = () => {
                           </ul>
                         </div>
 
-                        <div className="bg-gold/10 border border-gold/30 rounded-lg p-4">
-                          <p className="text-sm text-foreground">
-                            <span className="font-semibold">Fee:</span> ₹{FEE}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            Our specialists will review your documents and provide expert
+                            <div className="bg-gold/10 border border-gold/30 rounded-lg p-4">
+                              <p className="text-sm text-foreground">
+                                <span className="font-semibold">Fee:</span> ₹{FEE}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Our specialists will review your documents and
+                            provide expert
                             recommendations.
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-                {/* Step 4: Consent Form */}
-                {step === 4 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Consent & Legal Acknowledgement</CardTitle>
-                      <CardDescription>
-                        Please review and accept the consent form before proceeding to
+                    {/* Step 4: Consent Form */}
+                    {step === 4 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Consent & Legal Acknowledgement</CardTitle>
+                          <CardDescription>
+                        
+                        Please review and accept the consent form before
+                        proceeding to
                         payment
+                      
                       </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <p className="text-sm text-blue-900">
-                          <span className="font-semibold">Important:</span> You must
-                          accept the patient consent declaration to proceed with payment.
-                          This ensures you understand the limitations and scope of the
+                        </CardHeader>
+                        <CardContent>
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <p className="text-sm text-blue-900">
+                              <span className="font-semibold">Important:</span> You
+                          must
+                          accept the patient consent declaration to proceed
+                          with payment.
+                          This ensures you understand the
+                          limitations and scope of the
                           second opinion service.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Step 5: Payment */}
-                {step === 5 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Complete Payment</CardTitle>
-                      <CardDescription>Secure payment via Razorpay</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-6">
-                        <div className="bg-muted rounded-lg p-4 space-y-3">
-                          <div className="flex justify-between text-sm">
-                            <span>Service:</span>
-                            <span className="font-semibold">Second Opinion Review</span>
+                            </p>
                           </div>
-                          <div className="flex justify-between text-sm">
-                            <span>Documents:</span>
-                            <span className="font-semibold">
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Step 5: Payment */}
+                    {step === 5 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Complete Payment</CardTitle>
+                          <CardDescription>
+                        Secure payment via Razorpay
+                      </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-6">
+                            <div className="bg-muted rounded-lg p-4 space-y-3">
+                              <div className="flex justify-between text-sm">
+                                <span>Service:</span>
+                                <span className="font-semibold">
+                              Second Opinion Review
+                            </span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span>Documents:</span>
+                                <span className="font-semibold">
+                              
                               {files.length} file(s)
+                            
                             </span>
-                          </div>
-                          <div className="border-t pt-3 flex justify-between">
-                            <span className="font-semibold">Total Amount:</span>
-                            <span className="text-2xl font-bold text-gold">
+                              </div>
+                              <div className="border-t pt-3 flex justify-between">
+                                <span className="font-semibold">Total Amount:</span>
+                                <span className="text-2xl font-bold text-gold">
+                              
                               ₹{FEE}
+                            
                             </span>
-                          </div>
-                        </div>
+                              </div>
+                            </div>
 
-                        <Button
-                          variant="gold"
-                          onClick={handleRazorpayPayment}
-                          disabled={paymentProcessing}
-                          className="w-full"
-                        >
-                          {paymentProcessing ? "Processing..." : `Pay ₹${FEE}`}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                            <Button
+                              variant="gold"
+                              onClick={handleRazorpayPayment}
+                              disabled={paymentProcessing}
+                              className="w-full"
+                            >
+                              {paymentProcessing ? "Processing..." : `Pay ₹${FEE}`}
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
                 {/* Step 6: Confirmation */}
                 {step === 6 && (
@@ -587,64 +665,83 @@ const SecondOpinion = () => {
                   </Card>
                 )}
 
-                {/* Navigation Buttons */}
-                {step < 6 && (
-                  <div className="flex justify-between mt-8">
-                    <Button
-                      variant="outline"
-                      onClick={() => setStep(step - 1)}
-                      disabled={step === 1}
-                      className="flex items-center gap-2"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      Back
-                    </Button>
-                    {step < 5 && (
-                      <Button
-                        variant="gold"
-                        onClick={() => {
-                          if (
+                    {/* Navigation Buttons */}
+                    {step < 6 && (
+                      <div className="flex justify-between mt-8">
+                        <Button
+                          variant="outline"
+                          onClick={() => setStep(step - 1)}
+                          disabled={step === 1}
+                          className="flex items-center gap-2"
+                        >
+                          <ArrowLeft className="w-4 h-4" />
+                          Back
+                        </Button>
+                        {step < 5 && (
+                          <Button
+                            variant="gold"
+                            onClick={() => {
+                              if (
+                            
                             step === 1 &&
-                            (!formData.name || !formData.phone || !formData.email)
+                           
+                            (!formData.name ||
+                              !formData.phone ||
+                              !formData.email)
+                          
                           ) {
-                            toast({
+                                toast({
+                             
                               title: "Error",
+                             
                               description: "Please fill required fields",
+                           ,
                             });
-                            return;
-                          }
-                          if (
+                                return;
+                              }
+                              if (
+                            
                             step === 2 &&
+                           
                             (!formData.remarks || files.length === 0)
+                          
                           ) {
-                            toast({
+                                toast({
+                             
                               title: "Error",
+                             
                               description:
+                               
                                 "Please provide description and upload documents",
+                           ,
                             });
-                            return;
-                          }
-                          if (step === 3) {
-                            handleSubmitForm();
-                          } else if (step === 4) {
-                            setShowConsentForm(true);
-                          } else {
-                            setStep(step + 1);
-                          }
-                        }}
-                        disabled={loading}
-                        className="flex items-center gap-2"
-                      >
-                        {step === 3
+                                return;
+                              }
+                              if (step === 3) {
+                                handleSubmitForm();
+                              } else if (step === 4) {
+                                setShowConsentForm(true);
+                              } else {
+                                setStep(step + 1);
+                              }
+                            }}
+                            disabled={loading}
+                            className="flex items-center gap-2"
+                          >
+                            {step === 3
+                         
                           ? "Review & Proceed"
+                         
                           : step === 4
-                          ? "Review Consent"
-                          : "Continue"}
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
+                         
+                            ? "Review Consent"
+                         
+                            : "Continue"}
+                            <ArrowRight className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
 
                 {/* ConsentForm Modal */}
                 <ConsentForm
