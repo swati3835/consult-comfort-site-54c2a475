@@ -742,7 +742,7 @@ const SecondOpinion = () => {
                         )}
                       </div>
                     )}
-
+</div>
                 {/* ConsentForm Modal */}
                 <ConsentForm
                   open={showConsentForm}
@@ -752,8 +752,7 @@ const SecondOpinion = () => {
               </div>
           </div>
         </div>
-      </div>
-    </div>
+      
       </section>
     </Layout>
   );
